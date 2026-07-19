@@ -1,0 +1,1124 @@
+The right architecture is to make ContextGraph a compiled context system, not a live federation layer.
+
+Most expensive discovery, metadata scanning, semantic mapping, ontology enrichment, and relationship construction should happen offline or asynchronously. At agent request time, ContextGraph should query its own pre-built context stores and only access an operational source when the user actually needs fresh business data.
+
+The key principle is:
+
+Resolve from ContextGraph; retrieve facts from enterprise systems only when necessary.
+
+1. Three processing paths
+
+ContextGraph should have three distinct paths:
+
+1. Offline context-building pipeline
+   Builds and continuously refreshes the context model.
+2. Real-time context compilation
+   Resolves the agent’s question using precomputed context.
+3. Selective data execution
+   Accesses only the minimum required source when fresh data is needed.
+                        OFFLINE / ASYNCHRONOUS
+┌──────────────────────────────────────────────────────────────────────┐
+│ Enterprise metadata, schemas, catalogs, configurations and mappings │
+└──────────────────────────────┬───────────────────────────────────────┘
+                               │
+                               ▼
+                  ┌──────────────────────────┐
+                  │ Context-building pipeline│
+                  │ scan, map, validate,     │
+                  │ enrich, approve, compile │
+                  └─────────────┬────────────┘
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                 Compiled ContextGraph Runtime Stores                 │
+│ Entities │ aliases │ metrics │ relationships │ routes │ policies   │
+│ schema bindings │ freshness │ precomputed paths │ embeddings       │
+└──────────────────────────────┬───────────────────────────────────────┘
+                               │
+                         REAL-TIME REQUEST
+                               │
+                               ▼
+                  ┌──────────────────────────┐
+                  │ Context compiler         │
+                  │ resolve + authorize +    │
+                  │ create execution plan    │
+                  └─────────────┬────────────┘
+                                │
+                  ┌─────────────┴─────────────┐
+                  │                           │
+             Context-only answer       Fresh values required
+                  │                           │
+                  ▼                           ▼
+           Return immediately       Query selected source only
+
+2. Offline and asynchronous processing
+
+The offline pipeline builds the knowledge ContextGraph needs to answer questions without rediscovering the enterprise landscape every time.
+
+“Offline” does not necessarily mean nightly batch processing. It includes:
+
+* scheduled jobs,
+* event-driven updates,
+* CDC streams,
+* webhooks,
+* deployment-triggered compilation,
+* and human governance workflows.
+
+2.1 Source registration
+
+Before scanning anything, each source is registered in a source registry.
+
+Example:
+
+{
+  "source_id": "sap-s4-prod",
+  "source_type": "sap_s4hana",
+  "tenant_id": "customer-a",
+  "capabilities": [
+    "purchase_orders",
+    "suppliers",
+    "goods_receipts"
+  ],
+  "connection_mode": "customer_gateway",
+  "metadata_refresh": "daily",
+  "data_freshness": "realtime_on_demand",
+  "classification": "confidential"
+}
+
+The source registry records:
+
+* what the system contains,
+* which business domains it supports,
+* its owner,
+* how to connect,
+* its permitted operations,
+* freshness characteristics,
+* security classification,
+* and whether it is authoritative or supplementary.
+
+This prevents the real-time router from probing all available systems.
+
+2.2 Metadata discovery scans
+
+Metadata scans collect structure and meaning, not necessarily business transaction data.
+
+For SAP, the scan may collect:
+
+* available modules and APIs,
+* approved CDS views,
+* table and field metadata,
+* custom fields,
+* status code definitions,
+* company codes,
+* purchasing organizations,
+* material and vendor identifier formats,
+* relationships between approved business objects,
+* and authorization-relevant metadata.
+
+For Snowflake:
+
+* databases, schemas and tables,
+* columns and types,
+* primary/foreign-key hints,
+* views,
+* tags and classifications,
+* query history aggregates,
+* freshness,
+* ownership,
+* lineage,
+* and semantic views.
+
+For PLM:
+
+* part structures,
+* BOM schemas,
+* revision rules,
+* qualification relationships,
+* and product hierarchy metadata.
+
+The scanner should not copy every row into ContextGraph. It primarily creates a semantic inventory.
+
+Source system
+    ↓
+Metadata connector
+    ↓
+Normalized source model
+    ↓
+Candidate semantic bindings
+
+2.3 Metadata normalization
+
+Each source exposes metadata differently. The pipeline converts it into a canonical model.
+
+For example:
+
+{
+  "physical_asset": {
+    "source": "sap-s4-prod",
+    "object": "PurchaseOrderItem",
+    "fields": [
+      {
+        "physical_name": "Supplier",
+        "logical_type": "supplier_identifier"
+      },
+      {
+        "physical_name": "OrderQuantity",
+        "logical_type": "quantity"
+      }
+    ]
+  }
+}
+
+The normalized representation allows ContextGraph to reason about SAP, Snowflake and Oracle through one semantic model.
+
+2.4 Entity population
+
+The entity-loading pipeline creates or refreshes canonical business entities such as:
+
+* suppliers,
+* customers,
+* products,
+* components,
+* materials,
+* facilities,
+* organizational units,
+* systems,
+* metrics,
+* and business processes.
+
+It should use a layered process:
+
+Source records
+    ↓
+Normalization
+    ↓
+Exact identifier matching
+    ↓
+Alias matching
+    ↓
+Probabilistic candidate generation
+    ↓
+Conflict detection
+    ↓
+Approval where necessary
+    ↓
+Canonical entity publication
+
+ContextGraph may copy a limited amount of reference/master data needed for resolution:
+
+* canonical entity identifier,
+* legal and display names,
+* aliases,
+* entity type,
+* source identifiers,
+* status,
+* validity dates,
+* hierarchy,
+* and resolution evidence.
+
+It should not copy every transactional attribute unless required for a specific precomputed use case.
+
+2.5 Entity reconciliation and alias generation
+
+This process establishes that different source representations refer to the same business object.
+
+SAP vendor 00010427
+Snowflake supplier SK_HYNIX
+PLM manufacturer SKH
+User term “Hynix”
+             ↓
+Canonical supplier SUP-0042
+
+Aliases may come from:
+
+* source-system names,
+* customer-provided mapping files,
+* MDM systems,
+* abbreviations,
+* historical names,
+* steward-approved AI suggestions,
+* and usage feedback.
+
+AI or fuzzy matching should create candidates, not automatically publish high-risk mappings.
+
+2.6 Ontology population
+
+Ontology population occurs in layers.
+
+Global foundation ontology
+        ↓
+Supply-chain domain pack
+        ↓
+Semiconductor extension
+        ↓
+Customer-specific extension
+        ↓
+Environment-specific source bindings
+
+Foundation layer
+
+Defines general concepts:
+
+* organization,
+* supplier,
+* product,
+* component,
+* order,
+* facility,
+* metric,
+* source system.
+
+Industry pack
+
+Adds supply-chain or semiconductor meaning:
+
+* BOM,
+* tier-one supplier,
+* HBM,
+* wafer,
+* die,
+* package,
+* qualified component,
+* allocation agreement.
+
+Tenant layer
+
+Adds customer-specific terminology:
+
+* internal product families,
+* custom backlog definition,
+* division names,
+* supplier naming conventions,
+* custom risk statuses.
+
+Binding layer
+
+Connects business concepts to physical systems:
+
+open_purchase_order
+    → SAP source binding
+    → Snowflake source binding
+    → approved filters
+    → aggregation rules
+
+2.7 Metric mapping jobs
+
+Metric definitions should be compiled offline.
+
+For each metric, ContextGraph stores:
+
+* canonical metric ID,
+* business definition,
+* grain,
+* dimensions,
+* time semantics,
+* source precedence,
+* formula,
+* physical bindings,
+* validity dates,
+* owner,
+* approval status,
+* and version.
+
+Example:
+
+{
+  "metric_id": "open_po_quantity",
+  "definition_version": "3.2",
+  "grain": [
+    "supplier",
+    "material",
+    "purchase_order_item"
+  ],
+  "source_bindings": [
+    {
+      "source_id": "sap-s4-prod",
+      "operation": "purchase_order.open_quantity",
+      "priority": 1
+    },
+    {
+      "source_id": "snowflake-analytics",
+      "operation": "supply_chain.open_po_snapshot",
+      "priority": 2,
+      "freshness": "T-1"
+    }
+  ]
+}
+
+The source router should not determine these mappings from scratch during each request.
+
+2.8 Relationship population
+
+Relationships can be loaded from:
+
+* source metadata,
+* master data,
+* BOM extracts,
+* MDM,
+* approved business rules,
+* and stewardship mappings.
+
+Examples:
+
+Supplier SUPPLIES Component
+Component USED_IN BOM
+BOM BUILDS Product
+Product OWNED_BY BusinessUnit
+Metric SOURCED_FROM SourceBinding
+Entity IDENTIFIED_BY SourceIdentifier
+
+Each edge needs:
+
+* direction,
+* type,
+* source,
+* confidence class,
+* effective dates,
+* approval state,
+* tenant,
+* and evidence.
+
+2.9 Precomputed traversals and materialized paths
+
+Common graph paths should be computed ahead of time.
+
+For example:
+
+Supplier → Component → BOM → Product
+Supplier → Component → Product → Customer
+Material → Plant → Inventory Location
+
+Instead of traversing a large graph from first principles on every request, the pipeline can produce materialized impact indexes:
+
+supplier_product_impact
+component_product_usage
+product_customer_exposure
+supplier_material_mapping
+
+Example materialization:
+
+{
+  "supplier_id": "SUP-0042",
+  "product_id": "PROD-H200",
+  "relationship_path": [
+    "SUPPLIES",
+    "USED_IN",
+    "BUILDS"
+  ],
+  "path_version": "2026-06-27",
+  "valid_from": "2026-04-01",
+  "evidence_sources": [
+    "plm-bom-prod",
+    "sap-s4-prod"
+  ]
+}
+
+This is critical for low-latency answers.
+
+2.10 Route compilation
+
+The pipeline should precompile routing rules.
+
+For each canonical operation:
+
+Operation: procurement.open_purchase_order_quantity
+Primary source:
+  SAP S/4HANA procurement API
+Secondary source:
+  Snowflake daily snapshot
+Freshness behavior:
+  Use Snowflake for historical analysis.
+  Use SAP for current operational quantities.
+Required permissions:
+  procurement.po.read
+Supported dimensions:
+  supplier, material, plant, date
+Maximum time range:
+  24 months
+
+At runtime the router performs a lookup and policy evaluation. It does not inspect source schemas or ask every connector what it contains.
+
+2.11 Policy compilation
+
+Policies should also be processed offline into efficient runtime forms.
+
+Examples:
+
+* which agents may resolve which domains;
+* which users may see supplier relationships;
+* which metrics can be queried;
+* which source systems may be accessed;
+* whether transaction-level data can leave the customer VPC;
+* whether the request requires approval;
+* and whether a particular inference may be shown.
+
+Policy definitions may be stored in a system such as OPA, Cedar or a custom ABAC model, but runtime evaluation must operate on preloaded policies.
+
+2.12 Embedding and search-index generation
+
+Embeddings can be generated asynchronously for:
+
+* entity aliases,
+* ontology descriptions,
+* metric definitions,
+* sample questions,
+* source asset descriptions,
+* and business glossary content.
+
+The vectors are used at runtime for candidate retrieval, not as the final authority.
+
+Indexes should be regenerated incrementally when content changes.
+
+2.13 Human stewardship
+
+Not every mapping can be automatic.
+
+A governance queue should capture:
+
+* ambiguous entity matches,
+* conflicting metric definitions,
+* source precedence conflicts,
+* unrecognized terms,
+* low-confidence relationships,
+* policy conflicts,
+* and proposed ontology additions.
+
+Candidate generated
+    ↓
+Automated validation
+    ↓
+High confidence + low risk → publish
+    ↓
+Otherwise → steward review
+    ↓
+Approve / reject / modify
+    ↓
+New version published
+
+2.14 Validation and evaluation
+
+Before publishing a new context version, the pipeline should run:
+
+* schema validation,
+* orphan entity checks,
+* relationship integrity checks,
+* metric consistency tests,
+* source-binding tests,
+* policy tests,
+* temporal-overlap checks,
+* benchmark questions,
+* and regression evaluations.
+
+Only validated versions move to the runtime store.
+
+2.15 Publishing the runtime snapshot
+
+The final offline step creates an immutable, versioned runtime package.
+
+Ontology version: semiconductor-1.4
+Tenant overlay: customer-a-27
+Metric bundle: metrics-18
+Source bindings: bindings-12
+Policy bundle: policy-31
+Graph snapshot: graph-20260628-04
+
+This can be published atomically so requests never see a partially updated context graph.
+
+3. How frequently should offline jobs run?
+
+Different data types require different refresh strategies.
+
+Content	Recommended refresh
+Source schemas and metadata	Daily or on deployment event
+Ontology definitions	On approved change
+Metric definitions	On approved change
+Entity aliases	Hourly, daily, or event-driven
+Supplier/customer master data	CDC or frequent incremental batch
+BOM/product relationships	Event-driven or several times daily
+Source routing configuration	On configuration deployment
+Policies	On policy publication
+Embeddings	Incrementally after semantic changes
+Precomputed paths	Incrementally after relevant graph changes
+Historical aggregates	Daily/hourly depending on need
+Operational transactions	Usually not copied; queried on demand
+
+The pipeline should be incremental. A changed supplier alias should not rebuild the entire graph.
+
+4. Real-time agent request flow
+
+The real-time path should be small, predictable and primarily local to ContextGraph.
+
+Example request:
+
+“Which products are affected by delayed HBM supply from Hynix, and what is our open quantity?”
+
+Step 1: Authenticate the principal
+
+Identify:
+
+* tenant,
+* user,
+* agent,
+* application,
+* roles,
+* scopes,
+* and purpose.
+
+The tenant must come from trusted authentication claims, not merely a client-provided header.
+
+Step 2: Classify the request
+
+Determine:
+
+* domain,
+* intent,
+* requested operation,
+* read versus action,
+* whether fresh values are needed,
+* risk level,
+* and required response type.
+
+For the example:
+
+Domain: semiconductor supply chain
+Intent: supply impact and open commitment analysis
+Operations:
+  1. traverse supplier-to-product exposure
+  2. retrieve current open PO quantity
+
+Step 3: Retrieve candidate context locally
+
+ContextGraph searches only its runtime stores:
+
+* alias index,
+* entity index,
+* metric registry,
+* ontology index,
+* precomputed relationship index,
+* source registry,
+* policy store,
+* and semantic cache.
+
+It should not contact SAP, Snowflake or PLM during this phase.
+
+Possible resolutions:
+
+“Hynix” → SUP-0042, SK Hynix Inc.
+“HBM” → component class HBM
+“delayed supply” → supply disruption intent
+“open quantity” → metric open_po_quantity@3.2
+
+Step 4: Resolve ambiguities
+
+Apply:
+
+* tenant context,
+* entity type,
+* nearby terms,
+* approved business rules,
+* semantic similarity,
+* known sample questions,
+* and risk thresholds.
+
+If ambiguity remains, return alternatives or request clarification.
+
+Do not query sources just to resolve the language unless a rare dynamic lookup is explicitly required.
+
+Step 5: Perform policy evaluation
+
+Determine whether the principal may:
+
+* see the entities,
+* traverse the relationship,
+* access the metric,
+* query the selected source,
+* and receive detailed versus aggregated results.
+
+Step 6: Use precomputed graph context
+
+For affected products, use precomputed or locally stored relationships:
+
+SK Hynix
+    → supplies HBM3E
+    → used in memory assembly
+    → used by H200 and B200 products
+
+No PLM lookup is necessary if the relationship snapshot is fresh enough for the request.
+
+The response should disclose the relationship freshness:
+
+{
+  "relationship_snapshot": {
+    "as_of": "2026-06-28T01:00:00Z",
+    "source": "plm-bom-prod",
+    "version": "bom-184"
+  }
+}
+
+Step 7: Determine whether live execution is necessary
+
+Split the answer into two categories.
+
+Contextual facts
+
+Usually available locally:
+
+* what Hynix refers to,
+* what HBM means,
+* which metric definition applies,
+* likely affected products,
+* source of record,
+* appropriate operation,
+* permissions,
+* and explanation.
+
+Operational values
+
+May require a source request:
+
+* current open PO quantity,
+* current inventory,
+* latest supplier confirmation,
+* today’s shipment status,
+* current committed supply.
+
+The system should query a live source only for the operational values.
+
+Step 8: Select exactly one primary source
+
+Using precompiled route rules:
+
+open_po_quantity
+    ↓
+Primary: SAP S/4 procurement API
+Fallback: Snowflake open_po_snapshot
+
+The router should not broadcast the request to SAP, Snowflake and all other systems.
+
+It chooses based on:
+
+* requested freshness,
+* source authority,
+* availability,
+* latency,
+* cost,
+* permissions,
+* and route configuration.
+
+Example:
+
+Question asks “current”
+→ use SAP operational source
+Question asks “trend over the past 12 months”
+→ use Snowflake analytical source
+Question asks only “what does open PO mean?”
+→ no source query
+
+Step 9: Compile the execution plan
+
+The real-time service produces a connector-neutral plan:
+
+{
+  "operation": "procurement.open_purchase_order_quantity",
+  "arguments": {
+    "supplier_id": "SUP-0042",
+    "component_class": "HBM",
+    "product_ids": [
+      "PROD-H200",
+      "PROD-B200"
+    ]
+  },
+  "metric_version": "open_po_quantity@3.2",
+  "source_binding": "sap-mm-prod@7",
+  "required_permissions": [
+    "procurement.po.read"
+  ],
+  "freshness_requirement": "current"
+}
+
+Step 10: Execute through the customer gateway
+
+Only the chosen operation is sent to the execution gateway.
+
+The gateway:
+
+* validates the signed plan,
+* rechecks permissions,
+* translates the operation into the source-specific API/query,
+* executes using customer-held credentials,
+* normalizes the result,
+* and returns only the permitted fields.
+
+Step 11: Combine static context and live data
+
+Precomputed context:
+  affected products
+  metric meaning
+  relationship path
+Live result:
+  current open quantity
+  latest update timestamp
+
+Step 12: Return lineage and freshness
+
+The final response should distinguish what came from where.
+
+{
+  "answer": {
+    "affected_products": [
+      "H200",
+      "B200"
+    ],
+    "open_po_quantity": 125000
+  },
+  "context": {
+    "entity_resolution_version": "entities-42",
+    "ontology_version": "semiconductor-1.4",
+    "relationship_snapshot_as_of": "2026-06-28T01:00:00Z"
+  },
+  "live_execution": {
+    "source": "sap-s4-prod",
+    "retrieved_at": "2026-06-28T14:21:08Z"
+  }
+}
+
+5. Request categories and source-access behavior
+
+Not every question requires live source access.
+
+Category A: Definition questions
+
+Example:
+
+“What does backlog mean?”
+
+Uses:
+
+* metric dictionary,
+* ontology,
+* tenant definitions.
+
+Source calls: zero.
+
+Category B: Entity and relationship questions
+
+Example:
+
+“Which products use HBM from Hynix?”
+
+Uses:
+
+* entity index,
+* precomputed relationship graph,
+* BOM snapshot.
+
+Source calls: normally zero.
+
+A source call is needed only if the user explicitly requests the latest unprocessed change or the relationship snapshot is outside its freshness SLA.
+
+Category C: Historical analytical questions
+
+Example:
+
+“What was our Hynix delivery performance over the last 12 months?”
+
+Uses:
+
+* semantic definition,
+* route registry,
+* analytical warehouse.
+
+Source calls: one analytical source, usually Snowflake or Databricks.
+
+Category D: Current operational questions
+
+Example:
+
+“What is the current open PO quantity with Hynix?”
+
+Uses:
+
+* precompiled source binding,
+* operational source.
+
+Source calls: one operational source, such as SAP.
+
+Category E: Cross-domain aggregate questions
+
+Example:
+
+“Which products are at risk, and what customers are exposed?”
+
+This may require:
+
+* precomputed supplier/product/customer graph,
+* plus one live supply metric query.
+
+Source calls: zero to two, but only when separate fresh facts are truly required.
+
+Category F: Action requests
+
+Example:
+
+“Expedite these open orders.”
+
+Uses:
+
+* context compilation,
+* policy and approval,
+* transactional gateway.
+
+Source calls: one explicitly selected operational source, after confirmation and authorization.
+
+6. What data should ContextGraph cache or replicate?
+
+A useful classification is:
+
+Tier 1: Context data — replicate into ContextGraph
+
+* entities,
+* aliases,
+* identifiers,
+* classifications,
+* metric definitions,
+* hierarchies,
+* relationships,
+* source routes,
+* schema metadata,
+* policies,
+* effective dates,
+* and provenance.
+
+This is the core runtime context.
+
+Tier 2: Reference data — selectively replicate
+
+* supplier master subset,
+* product hierarchy,
+* material hierarchy,
+* BOM relationships,
+* facility mappings,
+* legal entity mappings,
+* and business calendars.
+
+Replicate only the fields needed for resolution and traversal.
+
+Tier 3: Materialized semantic facts — selectively replicate
+
+Examples:
+
+* supplier-to-product exposure,
+* current qualification status,
+* most recent source-health state,
+* daily supply-risk indicators,
+* and approved aggregate snapshots.
+
+Use these to support fast common workflows.
+
+Tier 4: Operational transactions — normally do not replicate
+
+* individual purchase orders,
+* shipment events,
+* invoices,
+* detailed inventory movements,
+* and sensitive transactional records.
+
+Retrieve these on demand from the authoritative system unless a particular use case justifies a governed analytical copy.
+
+7. Freshness model
+
+Every context item should have a freshness policy.
+
+{
+  "content_type": "supplier_product_relationship",
+  "last_refreshed_at": "2026-06-28T01:00:00Z",
+  "maximum_age": "24h",
+  "refresh_mode": "event_or_daily",
+  "stale_behavior": "return_with_warning"
+}
+
+Possible stale behaviors:
+
+* return cached result,
+* return cached result with warning,
+* trigger background refresh,
+* perform live lookup,
+* require confirmation,
+* or fail closed.
+
+The behavior should depend on business risk.
+
+For example:
+
+Information	Stale tolerance
+Metric definition	Days or until changed
+Supplier alias	Hours/days
+BOM relationship	Hours
+Current PO status	Minutes or live
+Inventory availability	Seconds/minutes
+Historical trend	Warehouse refresh cycle
+
+8. Cache strategy
+
+There should be multiple caches rather than one general Redis cache.
+
+Resolution cache
+
+Key:
+
+tenant + normalized phrase + domain + context version
+
+Stores entity and metric resolution.
+
+Compiled-plan cache
+
+Key:
+
+tenant + intent signature + entity IDs + metric version + policy version
+
+Stores reusable execution-plan templates.
+
+It should not cache user-specific authorization decisions indefinitely.
+
+Relationship cache
+
+Stores common paths and impact sets:
+
+supplier → affected products
+component → products
+product → customers
+
+Query-result cache
+
+Used only when safe.
+
+Key must include:
+
+* tenant,
+* principal scope where relevant,
+* operation,
+* arguments,
+* source binding,
+* policy version,
+* and freshness tier.
+
+Operational results should have short TTLs. Definitions and relationships can have longer TTLs.
+
+9. Recommended real-time latency budget
+
+For a request requiring a live source:
+
+Stage	Target p95
+Authentication and tenant context	5–10 ms
+Entity/metric resolution	20–50 ms
+Graph/context lookup	20–75 ms
+Policy and route selection	10–30 ms
+Plan compilation	5–20 ms
+Context-only total	<200 ms
+Source execution	source-dependent
+Final synthesis	separate budget
+
+The <200 ms target should apply to context compilation, not to the full enterprise query.
+
+10. Important design rule: do not scan at query time
+
+These actions should never be part of the normal agent-request path:
+
+* scanning SAP tables,
+* enumerating Snowflake schemas,
+* discovering foreign keys,
+* regenerating embeddings,
+* parsing ontology files,
+* rebuilding entity aliases,
+* inferring all source routes,
+* computing large graph communities,
+* importing BOM structures,
+* reconciling master data,
+* or testing connector capabilities.
+
+Those belong in the offline pipeline.
+
+11. Important design rule: source routing is metadata-driven
+
+The runtime source-selection logic should be similar to DNS resolution:
+
+Business operation
+    ↓
+Precompiled source binding
+    ↓
+One approved endpoint
+
+Not:
+
+Question
+    ↓
+Ask every source whether it might have the answer
+    ↓
+Compare responses
+
+Broadcast federation would create:
+
+* poor latency,
+* high source-system load,
+* inconsistent definitions,
+* security exposure,
+* increased costs,
+* and difficult failure behavior.
+
+12. Recommended end-to-end example
+
+Question:
+
+“Which products are exposed if Hynix HBM supply is delayed, and how much open supply do we have?”
+
+Offline work already completed
+
+“Hynix” mapped to SUP-0042
+HBM mapped to component class CMP-HBM
+Supplier-to-component relationships loaded
+Component-to-product paths materialized
+open_supply metric defined
+SAP operational binding compiled
+Snowflake analytical binding compiled
+Access policy published
+
+Real-time work
+
+1. Resolve Hynix locally.
+2. Resolve HBM locally.
+3. Retrieve affected products from materialized graph.
+4. Resolve open supply metric locally.
+5. Select SAP because user asks for current quantity.
+6. Compile one SAP operation.
+7. Execute through customer gateway.
+8. Merge the live quantity with precomputed product exposure.
+9. Return answer, lineage and freshness.
+
+Source interactions:
+
+PLM:       0 calls
+Snowflake: 0 calls
+SAP:       1 call
+
+If the question did not ask for current quantity:
+
+SAP:       0 calls
+
+Recommended architectural terminology
+
+I would name these systems explicitly:
+
+Context Build Plane
+  Metadata scanning, entity ingestion, mapping, ontology population,
+  materialization, validation and publication.
+Context Runtime Plane
+  Query-time entity resolution, semantic interpretation, policy
+  evaluation, graph lookup and execution-plan compilation.
+Execution Plane
+  Selective access to authoritative enterprise systems through a
+  customer-controlled gateway.
+Feedback Plane
+  Captures unresolved terms, corrections, execution outcomes and
+  steward approvals to improve future compiled context versions.
+
+This separation should become a central section of the architecture document because it explains the product’s latency, scalability, governance, and differentiation.
