@@ -1,0 +1,12 @@
+{
+  "primary": "databricks-claude-sonnet",
+  "fallback_chain": [
+    "databricks-meta-llama-3-70b-instruct"
+  ],
+  "max_tokens": 4096,
+  "temperature": 0.0,
+  "timeout_seconds": 30,
+  "max_retries": 2,
+  "tier_overrides": {},
+  "rationale": "Guaranty agreements require legal-term extraction around scope, limits, waivers, and continuing obligations."
+}

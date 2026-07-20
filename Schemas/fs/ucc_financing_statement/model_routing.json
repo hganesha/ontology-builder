@@ -1,0 +1,12 @@
+{
+  "primary": "databricks-meta-llama-3-70b-instruct",
+  "fallback_chain": [
+    "databricks-claude-sonnet"
+  ],
+  "max_tokens": 3072,
+  "temperature": 0.0,
+  "timeout_seconds": 30,
+  "max_retries": 2,
+  "tier_overrides": {},
+  "rationale": "UCC financing statements are structured filing forms. Llama is suitable for high-volume form extraction, with Claude retained for messy scanned filings and long collateral text."
+}

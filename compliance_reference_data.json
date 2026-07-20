@@ -1,0 +1,845 @@
+{
+  "matrices": [
+    {
+      "name": "Regulation × Industry",
+      "description": "Applicability and relevance by industry.",
+      "rowLabel": "Regulation",
+      "columns": [
+        "Auto",
+        "Battery",
+        "Electronics",
+        "Aerospace",
+        "Pharma",
+        "Medical Device",
+        "Retail/Apparel",
+        "Food",
+        "SaaS",
+        "Financial Services",
+        "Energy"
+      ],
+      "rows": [
+        [
+          "UFLPA",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "Low",
+          "Low",
+          "High",
+          "Medium",
+          "Low",
+          "Low",
+          "Medium"
+        ],
+        [
+          "EU Forced Labor Regulation",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "Medium",
+          "Medium",
+          "High",
+          "High",
+          "Low",
+          "Low",
+          "Medium"
+        ],
+        [
+          "CSDDD",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "High",
+          "High"
+        ],
+        [
+          "CSRD",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "High",
+          "High"
+        ],
+        [
+          "EU Battery Regulation",
+          "High",
+          "Critical",
+          "Medium",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Energy Storage"
+        ],
+        [
+          "Conflict Minerals (3TG)",
+          "High",
+          "High",
+          "Critical",
+          "High",
+          "Low",
+          "Medium",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Medium"
+        ],
+        [
+          "EMRT (Cobalt, Lithium etc.)",
+          "High",
+          "Critical",
+          "High",
+          "Medium",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "High"
+        ],
+        [
+          "EUDR",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Medium",
+          "Critical",
+          "Low",
+          "Low",
+          "Low"
+        ],
+        [
+          "REACH",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "High",
+          "Medium",
+          "Medium",
+          "Low",
+          "Low",
+          "Medium"
+        ],
+        [
+          "RoHS",
+          "High",
+          "Medium",
+          "Critical",
+          "Medium",
+          "Low",
+          "Medium",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low"
+        ],
+        [
+          "PFAS",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "Medium",
+          "Low",
+          "Low",
+          "Medium"
+        ],
+        [
+          "GDPR",
+          "Medium",
+          "Medium",
+          "Medium",
+          "Medium",
+          "Medium",
+          "High",
+          "High",
+          "Medium",
+          "Critical",
+          "Critical",
+          "Medium"
+        ],
+        [
+          "DORA",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Medium",
+          "Critical",
+          "Low"
+        ],
+        [
+          "CMMC/DFARS",
+          "Medium",
+          "Low",
+          "Medium",
+          "Critical",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low",
+          "Low"
+        ]
+      ]
+    },
+    {
+      "name": "Regulation × Minerals",
+      "description": "Mineral-specific applicability for battery, electronics, automotive, and aerospace.",
+      "rowLabel": "Regulation",
+      "columns": [
+        "Gold",
+        "Tin",
+        "Tungsten",
+        "Tantalum",
+        "Cobalt",
+        "Lithium",
+        "Nickel",
+        "Graphite",
+        "Mica",
+        "Copper",
+        "Rare Earths"
+      ],
+      "rows": [
+        [
+          "Dodd Frank Conflict Minerals",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No"
+        ],
+        [
+          "EU Conflict Minerals",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No"
+        ],
+        [
+          "EU Battery Regulation",
+          "No",
+          "No",
+          "No",
+          "No",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Medium",
+          "Medium",
+          "Medium"
+        ],
+        [
+          "EMRT",
+          "No",
+          "No",
+          "No",
+          "No",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "No",
+          "No"
+        ],
+        [
+          "UFLPA",
+          "Medium",
+          "Medium",
+          "Medium",
+          "Medium",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "High"
+        ],
+        [
+          "CSDDD",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High"
+        ],
+        [
+          "OECD Due Diligence",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High"
+        ]
+      ]
+    },
+    {
+      "name": "Regulation × Product Categories",
+      "description": "Product-level applicability reference.",
+      "rowLabel": "Regulation",
+      "columns": [
+        "Batteries",
+        "EVs",
+        "Semiconductors",
+        "Consumer Electronics",
+        "Medical Devices",
+        "Apparel",
+        "Food",
+        "Furniture",
+        "Software"
+      ],
+      "rows": [
+        [
+          "EU Battery Regulation",
+          "Critical",
+          "Critical",
+          "No",
+          "Medium",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No"
+        ],
+        [
+          "Conflict Minerals",
+          "High",
+          "High",
+          "Critical",
+          "Critical",
+          "Medium",
+          "No",
+          "No",
+          "No",
+          "No"
+        ],
+        [
+          "EMRT",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Low",
+          "No",
+          "No",
+          "No",
+          "No"
+        ],
+        [
+          "EUDR",
+          "No",
+          "No",
+          "No",
+          "No",
+          "No",
+          "Low",
+          "Critical",
+          "Critical",
+          "No"
+        ],
+        [
+          "UFLPA",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "Critical",
+          "Medium",
+          "Medium",
+          "No"
+        ],
+        [
+          "REACH",
+          "High",
+          "High",
+          "High",
+          "High",
+          "High",
+          "Medium",
+          "Medium",
+          "Medium",
+          "No"
+        ],
+        [
+          "RoHS",
+          "Medium",
+          "High",
+          "Critical",
+          "Critical",
+          "Medium",
+          "No",
+          "No",
+          "No",
+          "No"
+        ],
+        [
+          "GDPR",
+          "No",
+          "Medium",
+          "Medium",
+          "Medium",
+          "High",
+          "Medium",
+          "Medium",
+          "No",
+          "Critical"
+        ]
+      ]
+    },
+    {
+      "name": "Regulation × Supply Chain Tiers",
+      "description": "Priority by supplier tier and upstream actor.",
+      "rowLabel": "Regulation",
+      "columns": [
+        "Tier 1",
+        "Tier 2",
+        "Tier 3",
+        "Smelter",
+        "Refiner",
+        "Mine/Farm"
+      ],
+      "rows": [
+        [
+          "GDPR",
+          "Critical",
+          "Low",
+          "Low",
+          "N/A",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "DORA",
+          "Critical",
+          "Low",
+          "Low",
+          "N/A",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "UFLPA",
+          "Critical",
+          "Critical",
+          "Critical",
+          "High",
+          "High",
+          "Critical"
+        ],
+        [
+          "Conflict Minerals",
+          "Critical",
+          "High",
+          "High",
+          "Critical",
+          "Critical",
+          "Medium"
+        ],
+        [
+          "EMRT",
+          "Critical",
+          "High",
+          "High",
+          "Critical",
+          "Critical",
+          "Critical"
+        ],
+        [
+          "Battery Regulation",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical"
+        ],
+        [
+          "EUDR",
+          "Medium",
+          "Medium",
+          "Medium",
+          "N/A",
+          "N/A",
+          "Critical"
+        ],
+        [
+          "CSDDD",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical"
+        ]
+      ]
+    },
+    {
+      "name": "Regulation × Evidence Required",
+      "description": "Evidence expectations by regulation.",
+      "rowLabel": "Evidence Type",
+      "columns": [
+        "GDPR",
+        "UFLPA",
+        "Battery",
+        "Conflict Minerals",
+        "EUDR",
+        "CSDDD"
+      ],
+      "rows": [
+        [
+          "Supplier Questionnaire",
+          "Yes",
+          "Yes",
+          "Yes",
+          "Yes",
+          "Yes",
+          "Yes"
+        ],
+        [
+          "Policy Documents",
+          "Yes",
+          "Yes",
+          "Yes",
+          "Yes",
+          "Yes",
+          "Yes"
+        ],
+        [
+          "Audit Reports",
+          "Optional",
+          "Critical",
+          "Critical",
+          "Medium",
+          "Medium",
+          "Critical"
+        ],
+        [
+          "Site Assessments",
+          "Optional",
+          "Critical",
+          "High",
+          "Medium",
+          "Medium",
+          "High"
+        ],
+        [
+          "Geolocation Data",
+          "No",
+          "Medium",
+          "High",
+          "No",
+          "Critical",
+          "Medium"
+        ],
+        [
+          "Chain of Custody",
+          "No",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical"
+        ],
+        [
+          "Country of Origin",
+          "No",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical",
+          "Critical"
+        ],
+        [
+          "Smelter List",
+          "No",
+          "High",
+          "Critical",
+          "Critical",
+          "No",
+          "Medium"
+        ],
+        [
+          "Mine Information",
+          "No",
+          "High",
+          "Critical",
+          "Medium",
+          "No",
+          "Medium"
+        ],
+        [
+          "Carbon Footprint",
+          "No",
+          "No",
+          "Critical",
+          "No",
+          "Medium",
+          "High"
+        ],
+        [
+          "Product Composition",
+          "No",
+          "Medium",
+          "Critical",
+          "High",
+          "No",
+          "Medium"
+        ],
+        [
+          "Human Rights Assessment",
+          "No",
+          "Critical",
+          "Critical",
+          "Medium",
+          "Medium",
+          "Critical"
+        ]
+      ]
+    },
+    {
+      "name": "Master Data Object Matrix",
+      "description": "Core survey-engine mapping of reusable data objects to regulations.",
+      "rowLabel": "Data Object",
+      "columns": [
+        "UFLPA",
+        "Battery",
+        "Conflict Minerals",
+        "EUDR",
+        "GDPR",
+        "CSDDD",
+        "CSRD"
+      ],
+      "rows": [
+        [
+          "Supplier Profile",
+          "X",
+          "X",
+          "X",
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "Facility List",
+          "X",
+          "X",
+          "X",
+          "X",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Product List",
+          "X",
+          "X",
+          "X",
+          "X",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Material Composition",
+          "",
+          "X",
+          "X",
+          "",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Country of Origin",
+          "X",
+          "X",
+          "X",
+          "X",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Mine Information",
+          "X",
+          "X",
+          "",
+          "",
+          "",
+          "X",
+          ""
+        ],
+        [
+          "Farm Information",
+          "",
+          "",
+          "",
+          "X",
+          "",
+          "X",
+          ""
+        ],
+        [
+          "Smelter Information",
+          "X",
+          "X",
+          "X",
+          "",
+          "",
+          "X",
+          ""
+        ],
+        [
+          "Carbon Footprint",
+          "",
+          "X",
+          "",
+          "",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Human Rights Data",
+          "X",
+          "X",
+          "",
+          "",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Labor Practices",
+          "X",
+          "X",
+          "",
+          "",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Environmental Metrics",
+          "",
+          "X",
+          "",
+          "",
+          "",
+          "X",
+          "X"
+        ],
+        [
+          "Personal Data Processing",
+          "",
+          "",
+          "",
+          "",
+          "X",
+          "",
+          ""
+        ],
+        [
+          "Security Controls",
+          "",
+          "",
+          "",
+          "",
+          "X",
+          "",
+          ""
+        ],
+        [
+          "Corrective Actions",
+          "X",
+          "X",
+          "X",
+          "X",
+          "X",
+          "X",
+          "X"
+        ]
+      ]
+    }
+  ],
+  "entities": [
+    "Supplier",
+    "Facility",
+    "Product",
+    "Material",
+    "Component",
+    "Commodity",
+    "Mineral",
+    "Farm",
+    "Mine",
+    "Smelter",
+    "Refiner",
+    "Certificate",
+    "Audit",
+    "Policy",
+    "Corrective Action"
+  ]
+}

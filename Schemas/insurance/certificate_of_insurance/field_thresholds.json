@@ -1,0 +1,46 @@
+{
+  "default_threshold": 0.75,
+  "insured_name": {
+    "min_confidence": 0.9,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "High-impact field for Certificate of Insurance workflow."
+  },
+  "certificate_holder_name": {
+    "min_confidence": 0.9,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "High-impact field for Certificate of Insurance workflow."
+  },
+  "policy_numbers": {
+    "min_confidence": 0.85,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": false,
+    "regulatory_required": true,
+    "description": "High-impact field for Certificate of Insurance workflow."
+  },
+  "expiration_dates": {
+    "min_confidence": 0.85,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": false,
+    "regulatory_required": true,
+    "description": "High-impact field for Certificate of Insurance workflow."
+  },
+  "coverage_lines": {
+    "min_confidence": 0.9,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "Required field for Certificate of insurance extraction."
+  }
+}

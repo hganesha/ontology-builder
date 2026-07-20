@@ -1,0 +1,294 @@
+{
+  "document_type": "prior_auth",
+  "vertical": "healthcare",
+  "family": "healthcare_authorization",
+  "schema_version": "healthcare_prior_auth_v1",
+  "source_prompt": "prompt_v1.txt",
+  "output_contract": {
+    "fields_object": "extracted_fields",
+    "confidence_object": "confidence",
+    "metadata_object": "extraction_metadata"
+  },
+  "fields": [
+    {
+      "name": "authorization_id",
+      "type": "string",
+      "required": true,
+      "description": "Authorization id",
+      "section": "document_details",
+      "category": "descriptive"
+    },
+    {
+      "name": "request_status",
+      "type": "string",
+      "required": false,
+      "description": "Requested | Approved | Denied | Pending | Partially_Approved | Expired",
+      "section": "risk_and_compliance",
+      "category": "operational"
+    },
+    {
+      "name": "request_date",
+      "type": "date",
+      "required": false,
+      "description": "Request date",
+      "section": "dates_and_terms",
+      "category": "temporal"
+    },
+    {
+      "name": "decision_date",
+      "type": "date",
+      "required": false,
+      "description": "Decision date",
+      "section": "dates_and_terms",
+      "category": "temporal"
+    },
+    {
+      "name": "expiration_date",
+      "type": "date",
+      "required": false,
+      "description": "Expiration date",
+      "section": "dates_and_terms",
+      "category": "temporal"
+    },
+    {
+      "name": "patient_name",
+      "type": "string",
+      "required": false,
+      "description": "Patient name",
+      "section": "parties",
+      "category": "identity"
+    },
+    {
+      "name": "patient_dob",
+      "type": "string",
+      "required": false,
+      "description": "Patient dob",
+      "section": "document_details",
+      "category": "identity"
+    },
+    {
+      "name": "patient_member_id",
+      "type": "string",
+      "required": true,
+      "description": "Patient member id",
+      "section": "document_details",
+      "category": "identity"
+    },
+    {
+      "name": "payer_name",
+      "type": "string",
+      "required": false,
+      "description": "Payer name",
+      "section": "parties",
+      "category": "identity"
+    },
+    {
+      "name": "plan_name",
+      "type": "string",
+      "required": false,
+      "description": "Plan name",
+      "section": "parties",
+      "category": "identity"
+    },
+    {
+      "name": "requesting_provider_name",
+      "type": "string",
+      "required": false,
+      "description": "Requesting provider name",
+      "section": "parties",
+      "category": "identity"
+    },
+    {
+      "name": "requesting_provider_npi",
+      "type": "string",
+      "required": false,
+      "description": "Requesting provider npi",
+      "section": "document_details",
+      "category": "identity"
+    },
+    {
+      "name": "servicing_provider_name",
+      "type": "string",
+      "required": false,
+      "description": "Servicing provider name",
+      "section": "parties",
+      "category": "identity"
+    },
+    {
+      "name": "servicing_provider_npi",
+      "type": "string",
+      "required": false,
+      "description": "Servicing provider npi",
+      "section": "document_details",
+      "category": "identity"
+    },
+    {
+      "name": "diagnosis_codes",
+      "type": "array<string>",
+      "required": false,
+      "description": "Diagnosis codes",
+      "section": "document_details",
+      "category": "array"
+    },
+    {
+      "name": "procedure_codes",
+      "type": "array<string>",
+      "required": false,
+      "description": "Procedure codes",
+      "section": "document_details",
+      "category": "array"
+    },
+    {
+      "name": "medication_name",
+      "type": "string",
+      "required": false,
+      "description": "Medication name",
+      "section": "parties",
+      "category": "identity"
+    },
+    {
+      "name": "service_description",
+      "type": "string",
+      "required": false,
+      "description": "Service description",
+      "section": "document_details",
+      "category": "operational"
+    },
+    {
+      "name": "units_requested",
+      "type": "string",
+      "required": false,
+      "description": "Units requested",
+      "section": "document_details",
+      "category": "descriptive"
+    },
+    {
+      "name": "units_approved",
+      "type": "string",
+      "required": false,
+      "description": "Units approved",
+      "section": "document_details",
+      "category": "descriptive"
+    },
+    {
+      "name": "place_of_service",
+      "type": "string",
+      "required": false,
+      "description": "Place of service",
+      "section": "document_details",
+      "category": "descriptive"
+    },
+    {
+      "name": "denial_reason_code",
+      "type": "string",
+      "required": false,
+      "description": "Denial reason code",
+      "section": "document_details",
+      "category": "descriptive"
+    },
+    {
+      "name": "denial_reason_text",
+      "type": "string",
+      "required": false,
+      "description": "Denial reason text",
+      "section": "document_details",
+      "category": "descriptive"
+    },
+    {
+      "name": "appeal_deadline",
+      "type": "string",
+      "required": false,
+      "description": "Appeal deadline",
+      "section": "dates_and_terms",
+      "category": "temporal"
+    },
+    {
+      "name": "clinical_criteria_referenced",
+      "type": "string",
+      "required": false,
+      "description": "Clinical criteria referenced",
+      "section": "document_details",
+      "category": "descriptive"
+    }
+  ],
+  "sections": [
+    {
+      "id": "dates_and_terms",
+      "title": "Dates And Terms",
+      "description": "Dates And Terms fields extracted from the document.",
+      "fields": [
+        "appeal_deadline",
+        "decision_date",
+        "expiration_date",
+        "request_date"
+      ]
+    },
+    {
+      "id": "document_details",
+      "title": "Document Details",
+      "description": "Document Details fields extracted from the document.",
+      "fields": [
+        "authorization_id",
+        "clinical_criteria_referenced",
+        "denial_reason_code",
+        "denial_reason_text",
+        "diagnosis_codes",
+        "patient_dob",
+        "patient_member_id",
+        "place_of_service",
+        "procedure_codes",
+        "requesting_provider_npi",
+        "service_description",
+        "servicing_provider_npi",
+        "units_approved",
+        "units_requested"
+      ]
+    },
+    {
+      "id": "parties",
+      "title": "Parties",
+      "description": "Parties fields extracted from the document.",
+      "fields": [
+        "medication_name",
+        "patient_name",
+        "payer_name",
+        "plan_name",
+        "requesting_provider_name",
+        "servicing_provider_name"
+      ]
+    },
+    {
+      "id": "risk_and_compliance",
+      "title": "Risk And Compliance",
+      "description": "Risk And Compliance fields extracted from the document.",
+      "fields": [
+        "request_status"
+      ]
+    }
+  ],
+  "completeness_checklist": [
+    {
+      "id": "required_fields_present",
+      "description": "All required fields are present or explicitly null with low confidence when absent.",
+      "fields": [
+        "authorization_id",
+        "patient_member_id"
+      ]
+    },
+    {
+      "id": "section_coverage_reviewed",
+      "description": "Each declared section was reviewed for extractable evidence.",
+      "sections": [
+        "dates_and_terms",
+        "document_details",
+        "parties",
+        "risk_and_compliance"
+      ]
+    },
+    {
+      "id": "nested_lists_normalized",
+      "description": "Object array fields use their item_schema for consistent nested extraction.",
+      "fields": []
+    }
+  ]
+}

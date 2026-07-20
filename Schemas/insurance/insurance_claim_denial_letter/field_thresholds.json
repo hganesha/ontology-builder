@@ -1,0 +1,46 @@
+{
+  "default_threshold": 0.75,
+  "claim_number": {
+    "min_confidence": 0.9,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "High-impact field for Insurance Claim Denial Letter workflow."
+  },
+  "policy_number": {
+    "min_confidence": 0.9,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "High-impact field for Insurance Claim Denial Letter workflow."
+  },
+  "coverage_denied": {
+    "min_confidence": 0.85,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": false,
+    "regulatory_required": true,
+    "description": "High-impact field for Insurance Claim Denial Letter workflow."
+  },
+  "denial_reason": {
+    "min_confidence": 0.9,
+    "review_threshold": 0.7,
+    "quarantine_threshold": 0.5,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "High-impact field for Insurance Claim Denial Letter workflow."
+  },
+  "letter_date": {
+    "min_confidence": 0.9,
+    "review_on_breach": true,
+    "fail_on_breach": true,
+    "regulatory_required": true,
+    "description": "Required field for Claim denial letter extraction."
+  }
+}
